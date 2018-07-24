@@ -1,0 +1,67 @@
+Exercise #1
+Download the WHOLE benn.advanced_country_debt_indicators table from mode analytics.
+    SELECT * FROM benn.advanced_country_debt_indicators
+
+Exercise #2
+Create a new DB named countries in your local mysql instance.
+    CREATE DATABASE countries;
+
+Exercise #3
+Create a new table named country_debt with an adequate structure for the data in step 1
++-------------+---------+------+-----+---------+----------------+
+| Field       | Type    | Null | Key | Default | Extra          |
++-------------+---------+------+-----+---------+----------------+
+| country     | text    | YES  |     | NULL    |                |
+| year        | year(4) | YES  |     | NULL    |                |
+| public_debt | float   | YES  |     | NULL    |                |
+| gdp_growth  | float   | YES  |     | NULL    |                |
+| id          | int(11) | NO   | PRI | NULL    | auto_increment |
++-------------+---------+------+-----+---------+----------------+
+
+Exercise #4
+Load the data from step 1 into the table you created on step 3:
+ LOAD DATA INFILE 'country-data.csv' INTO TABLE country_debt FIELDS
+  TERMINATED BY ',' ENCLOSED BY "" LINES TERMINATED BY '\r\n' IGNORE 1 LINES;
+
+
+Exercise #5
+Create a query that selects the average gdp growth for each country
+ between the years 1990 and 2000. Show country name and gdp growth.
+SELECT country, AVG(gdp_growth) FROM country_debt WHERE year > 1990 AND year < 2000 GROUP BY country;
+
+
+Exercise #6
+Export your query to a file named NinetiesGDP.csv - use commas to 
+separate the values and quotes to enclose each field.
+
+        SELECT country, AVG(gdp_growth)
+        FROM country_debt 
+        WHERE year > 1989 AND year < 2001 GROUP BY country 
+        INTO OUTFILE 'NinetiesGDP.csv' FIELDS TERMINATED BY ',' 
+        ENCLOSED BY '"' LINES TERMINATED BY '\r\n';
+
+Exercise #7
+Create a query that sorts countries by historically highest GDP growth. 
+Show country and GDP growth, and show only 20 results. Take all available
+ yearly data into account. Export this query to a file named top20GDP.csv
+        SELECT country, SUM(gdp_growth) AS growth 
+        FROM country_debt GROUP BY country 
+        ORDER BY growth DESC 
+        LIMIT 20 
+        INTO OUTFILE 'top20gdp.csv' FIELDS TERMINATED 
+        BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\r\n';
+
+Exercise #8
+Which was the country with the largest debt public debt in 1999?    
+        SELECT country, MAX(public_debt) AS "largest debt public"
+        FROM country_debt
+        GROUP BY country;
+
+
+Exercise #9
+Which are the ten countries with the highest historical debt to gdp ratio?
+        SELECT country, SUM(public_debt) AS "Greater historical debt public"
+        FROM benn.advanced_country_debt_indicators
+        GROUP BY country
+        ORDER BY "Greater historical debt public" DESC
+        LIMIT 10;
